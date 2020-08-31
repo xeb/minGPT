@@ -50,11 +50,19 @@ class Trainer:
             self.device = torch.cuda.current_device()
             self.model = torch.nn.DataParallel(self.model).to(self.device)
 
-    def save_checkpoint(self):
+    def __get_raw_model(self):
         # DataParallel wrappers keep raw model object in .module attribute
-        raw_model = self.model.module if hasattr(self.model, "module") else self.model
+        return self.model.module if hasattr(self.model, "module") else self.model
+
+    def save_checkpoint(self):
+        raw_model = self.__get_raw_model()
         logger.info("saving %s", self.config.ckpt_path)
         torch.save(raw_model.state_dict(), self.config.ckpt_path)
+
+    def load_checkpoint(self):
+        raw_model = self.__get_raw_model()
+        logger.info("loading %s", self.config.ckpt_path)
+        raw_model.load_state_dict(torch.load(self.config.ckpt_path))
 
     def train(self):
         model, config = self.model, self.config
