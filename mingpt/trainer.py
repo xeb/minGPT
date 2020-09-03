@@ -68,7 +68,8 @@ class Trainer:
         model, config = self.model, self.config
         raw_model = model.module if hasattr(self.model, "module") else model
         optimizer = raw_model.configure_optimizers(config)
-
+        test_loss = None
+        
         def run_epoch(split):
             is_train = split == 'train'
             model.train(is_train)
