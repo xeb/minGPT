@@ -62,14 +62,15 @@ class Trainer:
     def load_checkpoint(self):
         raw_model = self.__get_raw_model()
         logger.info("loading %s", self.config.ckpt_path)
-        raw_model.load_state_dict(torch.load(self.config.ckpt_path))
+        state_dict=torch.load(self.config.ckpt_path, map_location=self.device)
+        raw_model.load_state_dict(state_dict)
 
     def train(self):
         model, config = self.model, self.config
         raw_model = model.module if hasattr(self.model, "module") else model
         optimizer = raw_model.configure_optimizers(config)
         test_loss = None
-        
+
         def run_epoch(split):
             is_train = split == 'train'
             model.train(is_train)
